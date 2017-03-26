@@ -2,9 +2,9 @@ import facebook
 import requests
 import simplejson as json
 
-access_token = 'EAACEdEose0cBAC3EascXdIKQlQVHiF0UVmm79smDqdkL9FE9Y0u13TpcRnTtFV3xY65Dyo83ytBwZAz4i7fkIm4z81obK8xzAhuYhNMuZAKDyZBpOCvRQgmPkAndYPhdrDKUHMbEyV4yFOZBniQo9VPwlZBzTmondye3ZCh1FTIXuQcmkR2YnfGa6ZAmu8EshUZD'
+access_token = 'EAACEdEose0cBACbENHAlNmvAsE3wtsm6FTDKjv9d8aZBil0a6QfkcRDOY2vS8E12ZAfsT5tkjwZAcpBuMVctBhZCAbHDcjM5G5vZClfphCrZANxpsk9DczV7YvnZCMdzFdvZCt2YcmVCtDGJE0Fa4AIcvWsHG1JNaw60Fzm7ruoCnC9WJ4yvWEIHRXv6r4cJz1QZD'
 user = '1665852693730402'
-graph = facebook.GraphAPI(access_token)
+graph = facebook.GraphAPI(access_token, version='2.7')
 
 profile = graph.get_object(user)
 feed = graph.get_connections(profile['id'], 'feed')
@@ -151,7 +151,7 @@ with open('friends.json', 'w') as f:
 print ("Accessing the public feed. Please be patient..")
 #Get the feed of the user
 
-number_of_posts = 500
+number_of_posts = 10
 counts = 0
 repeat = 1
 
@@ -180,7 +180,7 @@ count = 0
 
 for id in full_feed:
     try:
-        feed_arr.append(graph.get_object(id))
+        feed_arr.append(graph.get_object(id, fields = 'id,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
         count += 1
         print ("Progress (feed) : " + str(int(count/number_of_posts*100)) + "%")
 
