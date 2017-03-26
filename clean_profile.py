@@ -7,21 +7,12 @@ db = client.script
 
 users_raw = db.users_raw
 friends_raw = db.friends_raw
-ratings_raw = db.ratings_raw
-location_posts_raw = db.location_posts_raw
-feeds_raw = db.feeds_raw
 
 users = db.users
 friends = db.friends
-preferences = db.preferences
-locationPosts = db.locationPosts
-feeds = db.feeds
 
 user_raw_collection = users_raw.find()
 friends_raw_collection = friends_raw.find()
-preferences_raw_collection = ratings_raw.find()
-locations_collection = location_posts_raw.find()
-feeds_collection = feeds_raw.find()
 
 #function to clean the user profiles
 def cleanProfile(user):
@@ -37,15 +28,17 @@ def cleanProfile(user):
     profile['education'] = education
 
     work = []
-    for item in user['work']:
-        work.append(item['employer']['name'])
-    profile['work'] = work
+    if ('work' in user):
+        for item in user['work']:
+            work.append(item['employer']['name'])
+        profile['work'] = work
     return profile
 
 #Function to clean friends
 def cleanFriends(friendlist):
     result = {}
     result['id'] = friendlist['user_id']
+    result['total_count'] = friendlist['total_count']
     result['friends'] = []
     for friend in friendlist['friends']:
         result['friends'].append(friend['id'])
@@ -60,8 +53,8 @@ def cleanratings(ratings):
         result['prefs'].append({
             "post_id": rate['post_id'],
             "rating": float(rate['rating']),
-            "place_id": "155611874500173",
-            "name": "Kiri Vehera"
+            "place_id": rate['place_id'],
+            "name": rate['name']
         })
     return result
 
@@ -78,6 +71,8 @@ def cleanLocationPosts(tagged_posts):
         details['created_time'] = item['created_time']
         details['type'] = item['type']
 
+        if ('reactions' in item):
+            details['reactions'] = item['reactions']['data']
         if ('comments' in item):
             details['comments'] = item['comments']['data']
         if ('with_tags' in item):
@@ -101,6 +96,8 @@ def cleanUserFeed(feed):
         details['created_time'] = item['created_time']
         details['type'] = item['type']
 
+        if ('reactions' in item):
+            details['reactions'] = item['reactions']['data']
         if ('story' in item):
             details['story'] = item['story']
         if ('place' in item):
@@ -117,29 +114,12 @@ def cleanUserFeed(feed):
 
     return result
 
-
-for item in feeds_collection:
-    res = cleanUserFeed(item)
-    feeds.insert(res)
-
-"""
-for item in locations_collection:
-    res = cleanLocationPosts(item)
-    locationPosts.insert(res)
-"""
-"""
-for pref in preferences_raw_collection:
-    res = cleanratings(pref)
-    preferences.insert(res)
-"""
-"""
 for user in user_raw_collection:
     profile = cleanProfile(user)
     users.insert(profile)
-"""
-"""
+
 for friendlist in friends_raw_collection:
     result = cleanFriends(friendlist)
     friends.insert(result)
-"""
+
 

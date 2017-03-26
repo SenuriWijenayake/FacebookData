@@ -2,11 +2,11 @@ import facebook
 import requests
 import simplejson as json
 
-access_token = 'EAACEdEose0cBACbENHAlNmvAsE3wtsm6FTDKjv9d8aZBil0a6QfkcRDOY2vS8E12ZAfsT5tkjwZAcpBuMVctBhZCAbHDcjM5G5vZClfphCrZANxpsk9DczV7YvnZCMdzFdvZCt2YcmVCtDGJE0Fa4AIcvWsHG1JNaw60Fzm7ruoCnC9WJ4yvWEIHRXv6r4cJz1QZD'
+access_token = 'EAACEdEose0cBAL7iEQ3XVAh7vAfhMuxfdQHFgywHLnhOKrPl4oq4UbIvA3RLMDysmNTReRtuxbgL6yceUkWSKY2aZBlwPuZAdjrs4fzbiPZAa44xtCTWxV9PH1zcYoXZCFETZCYftPu0Pgm7ezpk18vTnqcZBdqSNZAo0y6pDZCQtkZCyVGPj1ZBKsOR7ZCOlXVHfcZD'
 user = '1665852693730402'
 graph = facebook.GraphAPI(access_token, version='2.7')
 
-profile = graph.get_object(user)
+profile = graph.get_object(user, fields = 'id,name,birthday,age_range,education,work,hometown,location')
 feed = graph.get_connections(profile['id'], 'feed')
 my_feed = graph.get_connections(profile['id'], 'feed', **{'fields':'place'})
 friends = graph.get_connections(id='me', connection_name='friends')
@@ -16,13 +16,12 @@ all_friends = []
 full_feed = []
 loc_tags = {}
 num_extract = 0
-
-#Extract user profile
-#print ("Downloading the user's public profile")
-#with open('profile.json', 'w') as f:
-#    json.dump(profile, f)
-
 """
+#Extract user profile
+print ("Downloading the user's public profile")
+with open('profile.json', 'w') as f:
+    json.dump(profile, f)
+
 print("Analyzing your profile to determine tagged places..")
 #Determine how many location posts to be extracted to gave 50 locations
 while True:
@@ -90,7 +89,7 @@ total = distint_ids.__len__()
 
 for id in ids:
     try:
-        location_feed_posts.append(graph.get_object(id))
+        location_feed_posts.append(graph.get_object(id, fields = 'id,from,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
         countx += 1
         print ("Progress (location_tags): " + str(int(countx/total*100)) + "%")
 
@@ -121,13 +120,13 @@ for location in location_ratings:
 
 rating_output = {}
 rating_output['user_id'] = user
-rating_output['ratings'] = location_ratings
+rating_output['prefs'] = location_ratings
 
 with open('ratings.json', 'w') as f:
     json.dump(rating_output, f)
 print ("Location ratings successfully stored!")
 
-
+"""
 #Get the friend list of the user
 while True:
     try:
@@ -144,6 +143,7 @@ print ("Successfully extracted your friend list!")
 friend_output = {}
 friend_output['user_id'] = user
 friend_output['friends'] = all_friends
+friend_output['total_count'] = friends['summary']['total_count']
 
 with open('friends.json', 'w') as f:
     json.dump(friend_output, f)
@@ -151,7 +151,7 @@ with open('friends.json', 'w') as f:
 print ("Accessing the public feed. Please be patient..")
 #Get the feed of the user
 
-number_of_posts = 10
+number_of_posts = 100
 counts = 0
 repeat = 1
 
@@ -180,7 +180,7 @@ count = 0
 
 for id in full_feed:
     try:
-        feed_arr.append(graph.get_object(id, fields = 'id,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
+        feed_arr.append(graph.get_object(id, fields = 'id,from,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
         count += 1
         print ("Progress (feed) : " + str(int(count/number_of_posts*100)) + "%")
 
@@ -195,6 +195,4 @@ with open('feed.json', 'w') as f:
     json.dump(feed_output, f)
 print ("Posts were successfully collected")
 
-
-
-
+"""
