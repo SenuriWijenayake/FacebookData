@@ -2,7 +2,7 @@ import facebook
 import requests
 import simplejson as json
 
-access_token = 'EAACEdEose0cBAL7iEQ3XVAh7vAfhMuxfdQHFgywHLnhOKrPl4oq4UbIvA3RLMDysmNTReRtuxbgL6yceUkWSKY2aZBlwPuZAdjrs4fzbiPZAa44xtCTWxV9PH1zcYoXZCFETZCYftPu0Pgm7ezpk18vTnqcZBdqSNZAo0y6pDZCQtkZCyVGPj1ZBKsOR7ZCOlXVHfcZD'
+access_token = 'EAACEdEose0cBAFhbqFXiBj88Gqzjnk7uPjk8FhgdZCCFYhu48IKrnhmMjLrrw6sanu6sw9W0FhNWMUTtl3tFm1kZCUk7L17dc9KPZC3nT3izJs3LCrqRzaJElR0f164hIBja8w3SN7EEdzRZCF2HFykRM5Psg4B3K3TprkRKZAjMrJYcIoc2sPwYWCSNN9mwZD'
 user = '1665852693730402'
 graph = facebook.GraphAPI(access_token, version='2.7')
 
@@ -16,7 +16,7 @@ all_friends = []
 full_feed = []
 loc_tags = {}
 num_extract = 0
-"""
+
 #Extract user profile
 print ("Downloading the user's public profile")
 with open('profile.json', 'w') as f:
@@ -89,7 +89,7 @@ total = distint_ids.__len__()
 
 for id in ids:
     try:
-        location_feed_posts.append(graph.get_object(id, fields = 'id,from,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
+        location_feed_posts.append(graph.get_object(id, fields = 'id,from,to,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
         countx += 1
         print ("Progress (location_tags): " + str(int(countx/total*100)) + "%")
 
@@ -126,7 +126,6 @@ with open('ratings.json', 'w') as f:
     json.dump(rating_output, f)
 print ("Location ratings successfully stored!")
 
-"""
 #Get the friend list of the user
 while True:
     try:
@@ -147,11 +146,11 @@ friend_output['total_count'] = friends['summary']['total_count']
 
 with open('friends.json', 'w') as f:
     json.dump(friend_output, f)
-"""
+
 print ("Accessing the public feed. Please be patient..")
 #Get the feed of the user
 
-number_of_posts = 100
+number_of_posts = 1000
 counts = 0
 repeat = 1
 
@@ -180,7 +179,7 @@ count = 0
 
 for id in full_feed:
     try:
-        feed_arr.append(graph.get_object(id, fields = 'id,from,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
+        feed_arr.append(graph.get_object(id, fields = 'id,from,to,created_time,type,story,likes,place,comments,with_tags,message,reactions'))
         count += 1
         print ("Progress (feed) : " + str(int(count/number_of_posts*100)) + "%")
 
@@ -195,4 +194,3 @@ with open('feed.json', 'w') as f:
     json.dump(feed_output, f)
 print ("Posts were successfully collected")
 
-"""

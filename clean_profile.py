@@ -7,31 +7,29 @@ db = client.script
 
 users_raw = db.users_raw
 friends_raw = db.friends_raw
-
 users = db.users
 friends = db.friends
-
 user_raw_collection = users_raw.find()
 friends_raw_collection = friends_raw.find()
+
+my_list = ['158166681197693', '215316428921518', '338630779623841', '360967734276457', '493756514088788', '513289528839108', '597739390412259', '759906994089981', '833875256656786', '835185656506141', '844424082283172', '912365158899147', '1092144847486370', '1405712699730541', '1521301744793023', '1552234955028497', '1694166527479154', '1774500396108984']
 
 #function to clean the user profiles
 def cleanProfile(user):
     profile = {}
     profile['id'] = user['id']
     profile['name'] = user['name']
-    profile['birthday'] = user['birthday']
-    profile['age'] = int(now.year) - int(user['birthday'][6:])
-    profile['hometown'] = user['hometown']['name']
-    education = []
-    for item in user['education']:
-        education.append(item['school']['name'])
-    profile['education'] = education
+    if ('birthday' in user):
+        profile['birthday'] = user['birthday']
+        profile['age'] = int(now.year) - int(user['birthday'][6:])
+    if ('hometown' in user):
+        profile['hometown'] = user['hometown']['name']
 
-    work = []
-    if ('work' in user):
-        for item in user['work']:
-            work.append(item['employer']['name'])
-        profile['work'] = work
+    if ('education' in user):
+        #Extract the most recent education
+        final = len(user['education'])
+        profile['education'] = user['education'][final-1]['school']['name']
+
     return profile
 
 #Function to clean friends
@@ -40,8 +38,9 @@ def cleanFriends(friendlist):
     result['id'] = friendlist['user_id']
     result['total_count'] = friendlist['total_count']
     result['friends'] = []
-    for friend in friendlist['friends']:
-        result['friends'].append(friend['id'])
+    for friend in my_list:
+        if(friendlist['user_id'] != friend):
+            result['friends'].append(friend)
     return result
 
 #Function to clean the location tagged posts
@@ -114,12 +113,14 @@ def cleanUserFeed(feed):
 
     return result
 
+"""
 for user in user_raw_collection:
     profile = cleanProfile(user)
     users.insert(profile)
 
-for friendlist in friends_raw_collection:
-    result = cleanFriends(friendlist)
+
+for x in friends_raw_collection:
+    result = cleanFriends(x)
     friends.insert(result)
 
-
+"""

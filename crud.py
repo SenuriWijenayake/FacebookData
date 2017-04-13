@@ -100,4 +100,4 @@ def getFriendCount(user):
 def getLastCommunication (active,other):
     active_feed = feeds.find_one({'user_id': active},{'_id':0})
     other_feed = feeds.find_one({'user_id': other},{'_id':0})
-    
+
