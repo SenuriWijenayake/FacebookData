@@ -8,6 +8,7 @@ db = client.script
 users_raw = db.users_raw
 friends_raw = db.friends_raw
 users = db.users
+users_coll = users.find()
 friends = db.friends
 user_raw_collection = users_raw.find()
 friends_raw_collection = friends_raw.find()
@@ -23,8 +24,13 @@ def cleanProfile(user):
         profile['birthday'] = user['birthday']
         profile['age'] = int(now.year) - int(user['birthday'][6:])
     if ('hometown' in user):
-        profile['hometown'] = user['hometown']['name']
-
+        x = user['hometown']['name']
+        y = x.split(',')
+        profile['hometown'] = y[0]
+    if ('gender' in user):
+        profile['gender'] = user['gender']
+    if ('religion' in user):
+        profile['religion'] = user['religion']
     if ('education' in user):
         #Extract the most recent education
         final = len(user['education'])
@@ -48,10 +54,11 @@ def cleanratings(ratings):
     result = {}
     result['user_id'] = ratings['user_id']
     result['prefs'] = []
-    for rate in ratings['ratings']:
+    for rate in ratings['prefs']:
+        rating = float(rate['rating'])
         result['prefs'].append({
             "post_id": rate['post_id'],
-            "rating": float(rate['rating']),
+            "rating": rating,
             "place_id": rate['place_id'],
             "name": rate['name']
         })
@@ -113,14 +120,9 @@ def cleanUserFeed(feed):
 
     return result
 
-"""
-for user in user_raw_collection:
-    profile = cleanProfile(user)
-    users.insert(profile)
+preferences_raw = db.preferences_raw.find()
+preferences = db.preferences
 
-
-for x in friends_raw_collection:
-    result = cleanFriends(x)
-    friends.insert(result)
-
-"""
+for user in preferences_raw:
+    result = cleanratings(user)
+    preferences.insert(result)

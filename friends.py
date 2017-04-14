@@ -1,11 +1,10 @@
 from pymongo import MongoClient
-import bson
-from data import data
 import simplejson as json
 
 client = MongoClient('localhost', 27017)
 db = client.script
-posts = db.locationPosts_raw.find()
+users = db.users.find()
+prefs = db.preferences.find()
 
 #Function to insert the location posts per user
 def cleanLocationPosts(tagged_posts):
@@ -71,7 +70,7 @@ def cleanLocationPosts(tagged_posts):
     except KeyError:
         return 0
 
-
+"""
 all_users = []
 for item in posts:
     x = cleanLocationPosts(item)
@@ -79,3 +78,15 @@ for item in posts:
 
 with open('locationPosts.json', 'w') as f:
     json.dump(all_users, f)
+"""
+
+all_users = []
+all_prefs = []
+
+for item in prefs:
+    all_prefs.append(item['user_id'])
+
+for item in users:
+    if (item['id'] not in all_prefs):
+        print (item['id'])
+
